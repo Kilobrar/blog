@@ -13,7 +13,7 @@ urlpatterns = [
     #API routes
     path("allPost/<int:pageNumber>", views.view_allPosts, name="allPost"),
     path("followings", views.view_followings, name="followings"),
-    path("followingPosts", views.view_following_posts, name="followingPosts"),
+    path("followingPosts/<int:pageNumber>", views.view_following_posts, name="followingPosts"),
     path("profilePage/<str:username>", views.view_profile_page, name="profilePage"),
     path("profilePagePosts/<str:username>/<int:pageNumber>", views.view_profile_page_posts, name="profilePagePosts"),
     path("followOrUnfollow/<str:username>", views.follow_or_unfollow, name="followOrUnfollow"),

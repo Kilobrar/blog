@@ -67,13 +67,11 @@ document.querySelector("#link-following").addEventListener("click", () => {
         }
     })
 
+    page = 1
+    document.querySelector("#morePostFollowing").addEventListener("click", () => {paginatedPostCreation(`/followingPosts/${page}`, "#morePostFollowing"," #follow-posts")})
+
     // Get all the posts of followed users
-    fetch("/followingPosts")
-    .then(response => response.json())
-    // Create div for the posts
-    .then(posts => { 
-        postCreationPreparation(posts, "#follow-posts", "Currently they have no posts") 
-    })
+    paginatedPostCreation(`/followingPosts/${page}`, "#morePostFollowing"," #follow-posts")
 })
 
 
@@ -85,7 +83,7 @@ function loadProfilePage(username){
 
     page = 1
 
-    document.querySelector("#morePostProfile").addEventListener("click", () => {paginatedPostCreation(`/profilePagePosts/${username}/${page}`, "#morePostProfile", "#profile-posts")})
+    document.querySelector("#morePostProfile").addEventListener("click", () => {paginatedPostCreation(`/followingPosts/${page}`, "morePostFollowing"," #follow-posts")})
     
     // Get the selected user's datas
     fetch(`/profilePage/${username}`)
@@ -137,6 +135,24 @@ function doFollowOrUnfollow(selectedUsername, datas){
             }
             document.querySelector("#followers").innerHTML = `Number of followers: ${datas.followers}`
         })
+}
+
+function paginatedPostCreation(fetcher, buttonId, displayDivID){
+    fetch(fetcher)
+    .then(response => response.json())
+    // Create div for all posts
+    .then(posts => { 
+        postCreationPreparation(posts[0], displayDivID, "There are absolutely no posts :(") 
+        page++
+        console.log(buttonId)
+        console.log(posts)
+        if(posts[1]){
+            document.querySelector(buttonId).style.display = "block"
+        }
+        else{
+            document.querySelector(buttonId).style.display = "none"
+        }
+    })
 }
 
 function postCreationPreparation(posts, id, nothing){
@@ -233,21 +249,4 @@ function liking(post){
                 likes.innerHTML = `<img src="static/network/like.png" alt="" id="likeImg${post.id}"> <span id="likeCounter${post.id}">${numberOfLikes-1}</span>`
             }
         })
-}
-
-function paginatedPostCreation(fetcher, buttonId, displayDivID){
-    console.log(fetcher)
-    fetch(fetcher)
-    .then(response => response.json())
-    // Create div for all posts
-    .then(posts => { 
-        postCreationPreparation(posts[0], displayDivID, "There are absolutely no posts :(") 
-        page++
-        if(posts[1]){
-            document.querySelector(buttonId).style.display = "block"
-        }
-        else{
-            document.querySelector(buttonId).style.display = "none"
-        }
-    })
 }

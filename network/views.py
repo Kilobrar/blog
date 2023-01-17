@@ -84,14 +84,19 @@ def view_followings(request):
     return JsonResponse([following.serialize() for following in followings], safe=False)
 
 
-def view_following_posts(request):
+def view_following_posts(request, pageNumber):
     followings = Following.objects.filter(follower=request.user).values("followed")
     
     followings = [following["followed"] for following in followings]
     
     posts = Post.objects.filter(user__in=followings)
 
-    return JsonResponse([post.serialize() for post in posts], safe=False)
+    p = Paginator(posts,2)
+    page = p.page(pageNumber)
+
+    nextExist = page.has_next()
+
+    return JsonResponse([[post.serialize() for post in page.object_list], nextExist], safe=False)
 
 
 def view_profile_page(request, username):
