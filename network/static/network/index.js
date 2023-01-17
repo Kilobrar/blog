@@ -93,7 +93,7 @@ function loadProfilePage(username){
     .then(datas => {
         document.querySelector("#username").innerHTML = datas.username
         document.querySelector("#followers").innerHTML = `Number of followers: ${datas.followers}`
-        document.querySelector("#followed").innerHTML = `Followed: ${datas.followed}`
+        document.querySelector("#followed").innerHTML = `Follow: ${datas.followed}`
 
         fetch("getCurrentUser")
         .then(response =>response.json())
@@ -190,6 +190,7 @@ function postCreationPreparation(posts, id, nothing){
 function postCreation(post, liked) {   
     // Create HTML elements for the data
     div = document.createElement("div")
+    div.classList.add("post")
     user = document.createElement("p")
     content = document.createElement("p")
     date = document.createElement("p")
@@ -197,6 +198,7 @@ function postCreation(post, liked) {
     likes.setAttribute("id", `like${post.id}`)
     // Fill the elements with data
     user.innerHTML = `<a href="#">${post.user}</a>`
+    user.classList.add("inline")
     content.innerText = post.content
     date.innerText = post.date
     if(!liked) {
@@ -210,6 +212,7 @@ function postCreation(post, liked) {
         event.stopImmediatePropagation();
         liking(post, liked) 
     })
+    likes.classList.add("inline")
     // Add eventlistener for loading profile page
     user.addEventListener("click", function(){loadProfilePage(post.user)})
     // add elements to the container

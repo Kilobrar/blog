@@ -1,8 +1,8 @@
 {% extends "network/layout.html" %}
 
 {% block body %}
-    <section class="bg-dark p-3">
-        <div id="all-posts" class="w-75 mx-4 text-light">
+    <section class="bg-dark">
+        <div id="all-posts" class="w-75 p-3 mx-4 text-light">
             <div id="compose-post" class="d-md-flex justify-content-between align-items-center p-2">
                 <div class="m-2">
                     <h1 class="text-warning">New Post</h1>
@@ -22,24 +22,30 @@
             <div id="display-posts">
 
             </div>
-            <div><button id="morePost" class="btn btn-light btn-sm my-2">More</button></div>
+            <div class="d-flex justify-content-center"><button id="morePost" class="btn btn-light btn-sm my-2">More</button></div>
         </div>
     </section>
 
-    <div id="profile">
-        <h3 id="username"></h3>
-        <div id="followers"></div>
-        <div id="followed"></div>
-        <button id="followOrUnfollow"></button>
-        <div id="profile-posts"></div>
-        <div><button id="morePostProfile">ˇ</button></div>
-    </div>
+    <section class="bg-dark">
+        <div id="profile" class="w-75 p-3 mx-4 text-light">
+            <div class="text-center">
+                <h3 id="username" class="text-warning"></h3>
+                <div id="followers"></div>
+                <div id="followed"></div>
+                <div class="d-flex justify-content-center m-2"><button id="followOrUnfollow" class="btn btn-warning"></button></div>
+            </div>
+            <div id="profile-posts"></div>
+            <div class="d-flex justify-content-center"><button id="morePostProfile" class="btn btn-light btn-sm my-2">More</button></div>
+        </div>
+    </section>
 
-    <div id="following">
-        <h1>You follow:</h1>
-        <ul id="follow"></ul>
-        <h2>Their Posts</h2>
-        <div id="follow-posts"></div>
-        <div><button id="morePostFollowing">ˇ</button></div>
-    </div>
+    <section class="bg-dark">
+        <div id="following" class="w-75 p-3 mx-4 text-light">
+            <h1 class="text-warning">You follow:</h1>
+            <ul id="follow"></ul>
+            <h2 class="text-warning">Their Posts</h2>
+            <div id="follow-posts"></div>
+            <button id="morePostFollowing" class="btn btn-light btn-sm my-2">More</button></div>
+        </div>
+</section>
 {% endblock %}
