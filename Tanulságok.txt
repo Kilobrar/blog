@@ -1,0 +1,9 @@
+Querysetet NEM tud normálisan továbbadni a JSON, megoldás: def serialize a modelben a jó formátumhoz (így tud idegen kulcs értékeket is visszaadni) 
+
+Linkekre nem adunk "click" eventlistenert, href attribútumba beadhatjuk a kívánt API-t
+
+Ez az async világ nagyobb mint gondoltam
+
+A fetch - .then promise-ket adnak vissza, szóval az utánuk lévő kód lefut szépen akkor is ha nem fejeződtek még be, ezért async
+
+Foreach nem nagyon kompatibilis az async dolgokkal, helyette promise.all + map
