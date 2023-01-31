@@ -185,3 +185,14 @@ def doLikeOrUnlike(request, id):
 
     selectedPost.save()
     return JsonResponse({"liked": liked}, safe=False)
+
+@login_required
+def deletePost(request, id):
+    try:
+        postToBeDeleted = Post.objects.get(pk=id)
+        postToBeDeleted.delete()
+        deleted = True
+    except:
+        deleted = False
+
+    return JsonResponse({"deleted": deleted}, safe=False)

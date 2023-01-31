@@ -20,5 +20,6 @@ urlpatterns = [
     path("doFollowOrUnfollow/<str:selectedUsername>", views.do_follow_or_unfollow, name="doFollowOrUnfollow"), 
     path("getCurrentUser", views.get_Current_User, name="getCurrentUser"),
     path("alreadyLiked/<int:id>", views.alreadyLiked, name="alreadyLiked"),
-    path("doLikeOrUnlike/<int:id>", views.doLikeOrUnlike, name="doLikeOrUnlike")
+    path("doLikeOrUnlike/<int:id>", views.doLikeOrUnlike, name="doLikeOrUnlike"),
+    path("deletePost/<int:id>", views.deletePost, name="deletePost")
 ]

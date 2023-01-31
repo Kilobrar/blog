@@ -7,7 +7,20 @@ const ids = ["display-posts", "follow-posts", "profile-posts"]
 let page = 1
 paginatedPostCreation(`/allPost/${page}`, "#morePost", "#display-posts")
 
-document.querySelector("#morePost").addEventListener("click", () => {paginatedPostCreation(`/allPost/${page}`, "#morePost", "#display-posts")})
+document.querySelector("#morePost").addEventListener("click", (event) => {
+    event.stopImmediatePropagation();
+    paginatedPostCreation(`/allPost/${page}`, "#morePost", "#display-posts")
+})
+
+document.querySelector("#loggedInUserLink").addEventListener("click", () => {
+    fetch("getCurrentUser")
+    .then(response => response.json())
+    .then(loggedInUser => {
+        console.log(loggedInUser)
+        loadProfilePage(loggedInUser.username)
+    })
+})
+
 
 document.querySelector("#link-allPosts").addEventListener("click", () => {
     // Show all posts and hide the others
@@ -68,8 +81,11 @@ document.querySelector("#link-following").addEventListener("click", () => {
     })
 
     page = 1
-    document.querySelector("#morePostFollowing").addEventListener("click", () => {paginatedPostCreation(`/followingPosts/${page}`, "#morePostFollowing"," #follow-posts")})
 
+    document.querySelector("#morePostFollowing").addEventListener("click", (event) => {
+        event.stopImmediatePropagation();
+        paginatedPostCreation(`/followingPosts/${page}`, "#morePostFollowing"," #follow-posts")
+    })
     // Get all the posts of followed users
     paginatedPostCreation(`/followingPosts/${page}`, "#morePostFollowing"," #follow-posts")
 })
@@ -80,10 +96,6 @@ function loadProfilePage(username){
     following.style.display = "none"
     allPosts.style.display = "none"
     profile.style.display = "block"
-
-    page = 1
-
-    document.querySelector("#morePostProfile").addEventListener("click", () => {paginatedPostCreation(`/followingPosts/${page}`, "morePostFollowing"," #follow-posts")})
     
     // Get the selected user's datas
     fetch(`/profilePage/${username}`)
@@ -113,7 +125,15 @@ function loadProfilePage(username){
                     })
                 })
             }
+            
         })
+    })
+
+    page = 1
+    
+    document.querySelector("#morePostProfile").addEventListener("click", (event) => {
+        event.stopImmediatePropagation();
+        paginatedPostCreation(`/profilePagePosts/${username}/${page}`, "#morePostProfile", "#profile-posts")
     })
     // Get the selected users posts
     paginatedPostCreation(`/profilePagePosts/${username}/${page}`, "#morePostProfile", "#profile-posts")
@@ -124,7 +144,6 @@ function doFollowOrUnfollow(selectedUsername, datas){
     fetch(`doFollowOrUnfollow/${selectedUsername}`)
         .then(response => response.json())
         .then(success => {
-            console.log(success)
             if(success.save == "Followed") {
                 button.innerText = "Unfollow"
                 datas.followers += 1
@@ -144,7 +163,6 @@ function paginatedPostCreation(fetcher, buttonId, displayDivID){
     .then(posts => { 
         postCreationPreparation(posts[0], displayDivID, "There are absolutely no posts :(") 
         page++
-        console.log(buttonId)
         console.log(posts)
         if(posts[1]){
             document.querySelector(buttonId).style.display = "block"
@@ -155,6 +173,7 @@ function paginatedPostCreation(fetcher, buttonId, displayDivID){
     })
 }
 
+// Deleting previously created posts if the number of page is one, check if each of the posts are liked 
 function postCreationPreparation(posts, id, nothing){
     // get the container element
     post = document.querySelector(id)
@@ -186,36 +205,45 @@ function postCreationPreparation(posts, id, nothing){
                 })
         })*/
 
-        // create divs for posts now for real
+        // checking if the posts are liked
         const fetchPromises = posts.map(profilePost => {
             return fetch(`alreadyLiked/${profilePost.id}`)
               .then(response => response.json())
         });
-          
+        
+        // calling postCreation for the posts
         Promise.all(fetchPromises)
         .then(results => {
-            results.forEach((liked, index) => {
-            const profilePost = posts[index];
-            postCreation(profilePost, liked.liked);
-            post.append(div);
-            });
+            fetch("getCurrentUser")
+            .then(response => response.json())
+            .then(loggedInUser => {
+                results.forEach((liked, index) => {
+                const profilePost = posts[index];
+                postCreation(profilePost, liked.liked, id, loggedInUser.username);
+                post.append(div);
+                });
+            })
         });                                      
     }
 }
 
-function postCreation(post, liked) {   
+// Create the HTML elements for each posts and add event listeners for some of them
+function postCreation(post, liked, id, loggedInUser) {   
     // Create HTML elements for the data
     div = document.createElement("div")
     div.classList.add("post")
+    div.setAttribute("id", `post${post.id}`)
     user = document.createElement("p")
     content = document.createElement("p")
     date = document.createElement("p")
     likes = document.createElement("div")
+    deleteDiv = document.createElement("div")
     likes.setAttribute("id", `like${post.id}`)
     // Fill the elements with data
     user.innerHTML = `<a href="#">${post.user}</a>`
     user.classList.add("inline")
     content.innerText = post.content
+    content.classList.add("my-2")
     date.innerText = post.date
     if(!liked) {
         likes.innerHTML = `<img src="static/network/like.png" alt="" id="likeImg${post.id}"> <span id="likeCounter${post.id}">${post.likes}</span>`
@@ -231,8 +259,29 @@ function postCreation(post, liked) {
     likes.classList.add("inline")
     // Add eventlistener for loading profile page
     user.addEventListener("click", function(){loadProfilePage(post.user)})
+
+    if(id == "#profile-posts" && loggedInUser == post.user){
+        deleteButton = document.createElement("button")
+        deleteButton.innerText = "Delete"
+        deleteButton.classList.add("btn", "btn-danger", "btn-sm", "m-2")
+        deleteButton.addEventListener("click", () => {deletePost(post.id)})
+        deleteDiv.append(deleteButton)
+    }
+
     // add elements to the container
-    div.append(user, content, date, likes)
+    div.append(user, content, date, likes, deleteDiv)
+}
+
+function deletePost(id){
+    fetch(`deletePost/${id}`)
+    .then(response => response.json())
+    .then(deleted => {
+        postToBeDeleted = document.querySelector(`#post${id}`)
+        postToBeDeleted.style.animationPlayState = "running"
+        postToBeDeleted.addEventListener('animationend', () => {
+            postToBeDeleted.remove()
+        })
+    })
 }
 
 function liking(post){
